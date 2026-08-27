@@ -1,11 +1,7 @@
 export function getCookie(name: string): string | undefined {
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const matches = document.cookie.match(
-    new RegExp(
-      '(?:^|; )' +
-        // eslint-disable-next-line no-useless-escape
-        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') +
-        '=([^;]*)'
-    )
+    new RegExp(`(?:^|; )${escapedName}=([^;]*)`)
   );
   return matches ? decodeURIComponent(matches[1]) : undefined;
 }
@@ -13,32 +9,32 @@ export function getCookie(name: string): string | undefined {
 export function setCookie(
   name: string,
   value: string,
-  props: { [key: string]: string | number | Date | boolean } = {}
+  props: Record<string, string | number | Date | boolean> = {}
 ) {
-  props = {
+  const cookieProps: Record<string, string | number | Date | boolean> = {
     path: '/',
     ...props
   };
 
-  let exp = props.expires;
-  if (exp && typeof exp === 'number') {
-    const d = new Date();
-    d.setTime(d.getTime() + exp * 1000);
-    exp = props.expires = d;
+  let expires = cookieProps.expires;
+  if (expires && typeof expires === 'number') {
+    const date = new Date();
+    date.setTime(date.getTime() + expires * 1000);
+    expires = date;
   }
 
-  if (exp && exp instanceof Date) {
-    props.expires = exp.toUTCString();
+  if (expires instanceof Date) {
+    cookieProps.expires = expires.toUTCString();
   }
-  value = encodeURIComponent(value);
-  let updatedCookie = name + '=' + value;
-  for (const propName in props) {
-    updatedCookie += '; ' + propName;
-    const propValue = props[propName];
+
+  let updatedCookie = `${name}=${encodeURIComponent(value)}`;
+  Object.entries(cookieProps).forEach(([propName, propValue]) => {
+    updatedCookie += `; ${propName}`;
     if (propValue !== true) {
-      updatedCookie += '=' + propValue;
+      updatedCookie += `=${propValue}`;
     }
-  }
+  });
+
   document.cookie = updatedCookie;
 }
 

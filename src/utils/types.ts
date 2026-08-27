@@ -16,6 +16,11 @@ export type TConstructorIngredient = TIngredient & {
   id: string;
 };
 
+export type TConstructorItems = {
+  bun: TIngredient | null;
+  ingredients: TConstructorIngredient[];
+};
+
 export type TOrder = {
   _id: string;
   status: string;
@@ -35,6 +40,16 @@ export type TOrdersData = {
 export type TUser = {
   email: string;
   name: string;
+};
+
+export type TNewOrder = {
+  _id: string;
+  status: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  number: number;
+  price: number;
 };
 
 export type TTabMode = 'bun' | 'sauce' | 'main';
